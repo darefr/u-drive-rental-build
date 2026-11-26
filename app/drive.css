@@ -1,7 +1,7 @@
 .drive-header {
-  background: var(--asphalt);
-  color: var(--white);
-  border-bottom: 1px solid var(--dark-line);
+  background: var(--paper);
+  color: var(--asphalt);
+  border-bottom: 1px solid var(--border);
 }
 .drive-header .masthead-inner {
   height: 76px;
@@ -9,9 +9,6 @@
 .drive-header .brand-lockup-image {
   width: 148px;
   height: auto;
-  padding: 3px 6px;
-  background-color: #fff;
-  border-radius: 3px;
   object-fit: contain;
 }
 .drive-header .main-nav {
@@ -529,7 +526,7 @@
     padding-inline: 14px;
   }
   .drive-header {
-    border-color: var(--dark-line);
+    border-color: var(--border);
   }
 }
 @media (min-width: 701px) and (max-width: 900px) {
