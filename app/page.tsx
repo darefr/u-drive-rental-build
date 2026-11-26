@@ -22,7 +22,7 @@ export default function HomePage() {
     name: business.name,
     telephone: business.phone,
     email: business.email,
-    logo: '/brand/u-drive-primary.png',
+    logo: '/brand/u-drive-user-logo.png',
     address: { '@type': 'PostalAddress', addressLocality: 'Kathmandu', addressCountry: 'NP' },
     areaServed: { '@type': 'Country', name: 'Nepal' },
     sameAs: [business.facebook],

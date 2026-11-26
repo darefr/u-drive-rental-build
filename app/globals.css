@@ -285,7 +285,9 @@
 }
 .brand-lockup-image {
   width: 153px;
-  height: auto;
+  height: 50px;
+  object-fit: cover;
+  object-position: center;
 }
 .utility-bar {
   background: var(--asphalt);
