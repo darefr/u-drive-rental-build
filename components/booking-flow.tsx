@@ -16,7 +16,7 @@ import {
   type RentalRequest,
   type RequestErrors,
 } from '@/lib/rental-request'
-import './booking.css'
+import type { TripSearch } from '@/lib/trip-search'
 
 const titles = [
   'Your trip details',
@@ -27,26 +27,30 @@ const titles = [
 export function BookingFlow({
   initialVehicle,
   initialMode,
+  initialTrip,
   today,
   embedded = false,
 }: {
   initialVehicle: string
   initialMode: RentalMode
+  initialTrip?: TripSearch
   today: string
   embedded?: boolean
 }) {
   const [request, setRequest] = useState<RentalRequest>({
     vehicle: initialVehicle,
     mode: initialMode,
-    pickupDate: '',
-    returnDate: '',
-    pickupLocation: '',
+    pickupDate: initialTrip?.start || '',
+    returnDate: initialTrip?.end || '',
+    pickupLocation: initialTrip?.pickup || '',
+    handover: 'pickup',
+    pickupTime: '',
     sameReturn: true,
     returnLocation: '',
     name: '',
     phone: '',
     email: '',
-    notes: '',
+    notes: initialTrip?.destination ? `Planned destination: ${initialTrip.destination}.` : '',
   })
   const [step, setStep] = useState(0)
   const [ready, setReady] = useState(false)
@@ -176,7 +180,11 @@ export function BookingFlow({
         <div>
           <Eyebrow>RENTAL REQUEST</Eyebrow>
           <h1 className="display section-title">PLAN YOUR DRIVE.</h1>
-          <p>Your car, your dates, and a clear estimate before you send.</p>
+          <p>
+            {initialTrip?.destination
+              ? `Your ${initialTrip.destination} itinerary. Choose a car and dates to build your request.`
+              : 'Your car, your dates, and a clear estimate before you send.'}
+          </p>
         </div>
         <a className="booking-help" href={`tel:${business.phone}`}>
           <Phone size={17} />

@@ -7,6 +7,11 @@ import { DateField } from '@/components/date-field'
 import { money, vehicles } from '@/lib/fleet'
 import { nextDate, type RentalRequest, type RequestErrors } from '@/lib/rental-request'
 
+const pickupTimes = Array.from(
+  { length: 48 },
+  (_, i) => `${String(Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`,
+)
+
 export type FieldsProps = {
   request: RentalRequest
   errors: RequestErrors
@@ -88,9 +93,46 @@ export function TripFields({
           onChange={(returnDate) => update({ returnDate })}
         />
       </div>
+      <div className="form-two-col">
+        <Field>
+          <FieldLabel htmlFor="handover">Handover preference</FieldLabel>
+          <select
+            id="handover"
+            value={request.handover}
+            onChange={(e) =>
+              update({ handover: e.target.value === 'delivery' ? 'delivery' : 'pickup' })
+            }
+          >
+            <option value="pickup">Collect the vehicle</option>
+            <option value="delivery">Request delivery</option>
+          </select>
+        </Field>
+        <Field data-invalid={Boolean(errors.pickupTime)}>
+          <FieldLabel htmlFor="pickupTime">Preferred time (Nepal)</FieldLabel>
+          <select
+            id="pickupTime"
+            value={request.pickupTime}
+            onChange={(e) => update({ pickupTime: e.target.value })}
+            aria-invalid={Boolean(errors.pickupTime)}
+            aria-describedby={errors.pickupTime ? 'pickupTime-error' : undefined}
+          >
+            <option value="">Arrange with U Drive</option>
+            {pickupTimes.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+          <FieldError id="pickupTime-error">{errors.pickupTime}</FieldError>
+        </Field>
+      </div>
       <TextField
         id="pickupLocation"
-        label="Pickup / delivery location"
+        label={
+          request.handover === 'delivery'
+            ? 'Preferred delivery location'
+            : 'Preferred pickup location'
+        }
         type="text"
         placeholder="Hotel, neighbourhood, or meeting point"
         required

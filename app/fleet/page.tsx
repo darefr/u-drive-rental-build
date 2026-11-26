@@ -8,7 +8,12 @@ export const metadata = pageMeta(
   '/fleet',
   '/images/deepal-s05.webp',
 )
-export default function FleetPage() {
+import { readTripSearch, type QueryValues } from '@/lib/trip-search'
+import { todayInNepal } from '@/lib/rental-request'
+
+export default async function FleetPage({ searchParams }: { searchParams: Promise<QueryValues> }) {
+  const q = await searchParams
+  const trip = Object.keys(q).length ? readTripSearch(q, todayInNepal()) : undefined
   return (
     <main id="main-content">
       <div className="shell">
@@ -22,7 +27,7 @@ export default function FleetPage() {
             <strong>04</strong> VEHICLES
           </span>
         </div>
-        <FleetCatalogue />
+        <FleetCatalogue key={JSON.stringify(trip)} trip={trip} />
         <p className="catalogue-footnote">
           Daily vehicle rates are shown in Nepalese rupees. Availability, driver arrangements, and
           delivery are confirmed for your booking. Vehicle images are illustrative.

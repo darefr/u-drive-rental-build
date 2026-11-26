@@ -12,9 +12,8 @@ export function SiteFooter() {
           <div className="footer-identity">
             <Brand reversed />
             <p>
-              Car rentals from Kathmandu.
-              <br />
-              The freedom to explore Nepal.
+              Self-drive and driver-assisted car rentals from Kathmandu. Choose your car, plan your
+              route, and explore Nepal at your own pace.
             </p>
             <a
               href={whatsappLink()}

@@ -22,12 +22,14 @@ export function DateField({
   value,
   minimum,
   error,
+  optional = false,
   onChange,
 }: {
   id: string
   label: string
   value: string
   minimum: string
+  optional?: boolean
   error?: string
   onChange: (value: string) => void
 }) {
@@ -42,9 +44,11 @@ export function DateField({
     <Field data-invalid={Boolean(error)}>
       <FieldLabel id={`${id}-label`} htmlFor={id}>
         {label}
-        <span className="required-star" aria-hidden="true">
-          *
-        </span>
+        {!optional && (
+          <span className="required-star" aria-hidden="true">
+            *
+          </span>
+        )}
       </FieldLabel>
       <button
         ref={trigger}

@@ -6,7 +6,7 @@ import { pageMeta } from '@/lib/site'
 
 export const metadata = pageMeta(
   'How Car Rental Works',
-  'Follow the six steps from choosing a U Drive rental car to pickup or delivery. Understand rental requests, estimates, and personal confirmation.',
+  'Follow the five steps from choosing a U Drive rental car to pickup or delivery. Understand rental requests, estimates, and personal confirmation.',
   '/how-it-works',
 )
 export default function HowItWorksPage() {
@@ -23,7 +23,7 @@ export default function HowItWorksPage() {
               TO KEYS.
             </h1>
             <p className="body-copy">
-              Six steps from your first look at the fleet to your agreed pickup. A request starts
+              Five steps from your first look at the fleet to your agreed pickup. A request starts
               the conversation; U Drive confirms the rental.
             </p>
             <div className="journey-image">

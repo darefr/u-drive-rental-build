@@ -1,11 +1,4 @@
-import {
-  CalendarDays,
-  CarFront,
-  ClipboardCheck,
-  KeyRound,
-  MessageCircle,
-  Route,
-} from 'lucide-react'
+import { CalendarDays, CarFront, ClipboardCheck, KeyRound, Route } from 'lucide-react'
 import { Eyebrow } from './brand'
 import { TextLink } from './editorial'
 
@@ -30,19 +23,13 @@ const steps = [
     title: 'Set your dates',
     short: 'Select your dates',
     icon: CalendarDays,
-    body: 'Choose your pickup and return dates. Your estimate updates using the daily vehicle rate and the number of rental days.',
+    body: 'Choose your pickup and return dates, then add a preferred pickup time in Nepal. Your estimate updates using the vehicle’s daily rate and the number of rental days.',
   },
   {
-    title: 'Send your request',
-    short: 'Send your request',
-    icon: MessageCircle,
-    body: 'Add your contact details and pickup location. Review the summary, then send your prepared request directly to U Drive by WhatsApp or email.',
-  },
-  {
-    title: 'Confirm with U Drive',
-    short: 'Confirm the details',
+    title: 'Request & confirm',
+    short: 'Confirm your rental',
     icon: ClipboardCheck,
-    body: 'The team will confirm vehicle availability, requirements, the final rental terms, and your meeting point. A request on its own is not a confirmed reservation.',
+    body: 'Review your estimate and send your request by WhatsApp or email. U Drive confirms the vehicle, final terms, and meeting point with you. Preparing a request does not reserve a car.',
   },
   {
     title: 'Collect your car',
@@ -83,7 +70,7 @@ export function ProcessTimeline() {
           <span className="timeline-number">0{i + 1}</span>
           <div>
             <p className="overline">
-              {i < 3 ? 'PLAN YOUR TRIP' : i < 5 ? 'ARRANGE YOUR RENTAL' : 'ON THE ROAD'}
+              {i < 3 ? 'PLAN YOUR TRIP' : i === 3 ? 'ARRANGE YOUR RENTAL' : 'ON THE ROAD'}
             </p>
             <h2>{s.title}.</h2>
             <p>{s.body}</p>

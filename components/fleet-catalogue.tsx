@@ -2,18 +2,47 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, ArrowUpRight, ChevronDown, SlidersHorizontal } from 'lucide-react'
-import { bookingLink, money, vehicles } from '@/lib/fleet'
+import { CalendarDays, ChevronDown, MapPin, RotateCcw, SlidersHorizontal } from 'lucide-react'
+import { modeName, vehicles } from '@/lib/fleet'
+import { prettyDate } from '@/lib/rental-request'
+import type { TripSearch } from '@/lib/trip-search'
+import { VehicleCard } from './fleet-showcase'
 
-export function FleetCatalogue() {
+export function FleetCatalogue({ trip }: { trip?: TripSearch }) {
   const [filter, setFilter] = useState('All vehicles')
   const [sort, setSort] = useState('featured')
   const cars = vehicles
-    .filter((v) => filter === 'All vehicles' || v.category === filter)
+    .filter(
+      (v) =>
+        (!trip?.vehicle || v.slug === trip.vehicle) &&
+        (filter === 'All vehicles' || v.category === filter),
+    )
     .sort((a, b) => (sort === 'low' ? a.rate - b.rate : sort === 'high' ? b.rate - a.rate : 0))
   return (
     <section className="catalogue" aria-label="Vehicle catalogue">
+      {trip && (
+        <div className="trip-results-summary">
+          <div>
+            <strong>Your trip search</strong>
+            <span>
+              <MapPin size={15} />
+              {trip.pickup || 'Pickup to arrange'}
+            </span>
+            <span>{modeName(trip.mode)}</span>
+            {trip.start && (
+              <span>
+                <CalendarDays size={15} />
+                {prettyDate(trip.start)}
+                {trip.end ? ` – ${prettyDate(trip.end)}` : ''}
+              </span>
+            )}
+          </div>
+          <Link href="/fleet">
+            <RotateCcw size={14} />
+            Clear search
+          </Link>
+        </div>
+      )}
       <div className="catalogue-controls">
         <fieldset className="catalogue-filters">
           <legend className="sr-only">Filter by body style</legend>
@@ -23,7 +52,6 @@ export function FleetCatalogue() {
                 className="sr-only"
                 type="radio"
                 name="body-style"
-                value={label}
                 checked={filter === label}
                 onChange={() => setFilter(label)}
               />
@@ -43,53 +71,29 @@ export function FleetCatalogue() {
         </label>
       </div>
       <p className="result-count" role="status">
-        {cars.length} {cars.length === 1 ? 'vehicle' : 'vehicles'} in this collection
+        {cars.length} {cars.length === 1 ? 'vehicle' : 'vehicles'}
+        {trip
+          ? ' matching your selection · Availability confirmed on request'
+          : ' in the U Drive collection'}
       </p>
-      <div className="catalogue-list">
+      <div className="catalogue-car-grid">
         {cars.map((v, i) => (
-          <article key={v.slug} className="catalogue-row">
-            <Link
-              className="catalogue-image"
-              href={`/fleet/${v.slug}`}
-              aria-label={`Explore ${v.name}`}
-            >
-              <Image
-                src={`/images/${v.slug}.webp`}
-                alt={v.imageAlt}
-                fill
-                sizes="(max-width: 760px) 94vw, 48vw"
-                loading={i === 0 ? 'eager' : 'lazy'}
-              />
-            </Link>
-            <div className="catalogue-content">
-              <p className="eyebrow">
-                <span className="lane-mark" />
-                {v.label}
-              </p>
-              <h2>
-                <Link href={`/fleet/${v.slug}`}>{v.name}</Link>
-              </h2>
-              <p className="catalogue-description">{v.description}</p>
-              <div className="catalogue-modes">
-                <span>Self Drive</span>
-                <i /> <span>With Driver</span>
-              </div>
-              <div className="catalogue-rate">
-                <strong>{money(v.rate)}</strong>
-                <span> / day</span>
-              </div>
-              <div className="action-row">
-                <Link href={`/fleet/${v.slug}`} className="action action-dark">
-                  View details <ArrowUpRight />
-                </Link>
-                <Link href={bookingLink(v.slug)} className="text-action">
-                  Book this car <ArrowRight size={15} />
-                </Link>
-              </div>
-            </div>
-          </article>
+          <VehicleCard key={v.slug} vehicle={v} trip={trip} eager={i < 2} />
         ))}
       </div>
+      {cars.length === 0 && (
+        <div className="empty-fleet">
+          <h2>No matches in this body style.</h2>
+          <p>Keep your trip details and show all body styles, or start a fresh search.</p>
+          <button
+            type="button"
+            className="action action-dark"
+            onClick={() => setFilter('All vehicles')}
+          >
+            Show all body styles
+          </button>
+        </div>
+      )}
     </section>
   )
 }

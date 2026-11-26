@@ -5,11 +5,14 @@ import { Breadcrumbs, FAQAccordion, TextLink } from '@/components/editorial'
 import { Eyebrow } from '@/components/brand'
 import { VehicleGallery } from '@/components/vehicle-gallery'
 import { VehicleBookingPanel } from '@/components/vehicle-booking-panel'
+import { VehicleSpecs } from '@/components/vehicle-specs'
+import { readTripSearch, tripHref, type QueryValues } from '@/lib/trip-search'
+import { todayInNepal } from '@/lib/rental-request'
 import { VehicleCard } from '@/components/fleet-showcase'
-import { bookingLink, findVehicle, money, vehicles, whatsappLink } from '@/lib/fleet'
+import { findVehicle, money, vehicles, whatsappLink } from '@/lib/fleet'
 import { pageMeta } from '@/lib/site'
 
-type Props = { params: Promise<{ slug: string }> }
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<QueryValues> }
 export const dynamicParams = false
 export function generateStaticParams() {
   return vehicles.map(({ slug }) => ({ slug }))
@@ -25,9 +28,11 @@ export async function generateMetadata({ params }: Props) {
       )
     : { title: 'Vehicle not found' }
 }
-export default async function VehiclePage({ params }: Props) {
+export default async function VehiclePage({ params, searchParams }: Props) {
   const v = findVehicle((await params).slug)
   if (!v) notFound()
+  const trip = readTripSearch(await searchParams, todayInNepal())
+  const booking = tripHref('/booking', { ...trip, vehicle: v.slug })
   return (
     <main id="main-content" className="model-page">
       <div className="shell">
@@ -65,7 +70,7 @@ export default async function VehiclePage({ params }: Props) {
                 <dd>Confirmed on request</dd>
               </div>
             </dl>
-            <Link className="action action-gold" href={bookingLink(v.slug)}>
+            <Link className="action action-gold" href={booking}>
               Book Now <ArrowRight />
             </Link>
             <a
@@ -78,6 +83,7 @@ export default async function VehiclePage({ params }: Props) {
             </a>
           </section>
         </div>
+        <VehicleSpecs vehicle={v} />
         <section className="model-request">
           <div className="model-request-copy">
             <Eyebrow>BOOK THIS MODEL</Eyebrow>
@@ -99,7 +105,7 @@ export default async function VehiclePage({ params }: Props) {
               ]}
             />
           </div>
-          <VehicleBookingPanel vehicle={v} />
+          <VehicleBookingPanel vehicle={v} trip={trip} />
         </section>
         <section className="related-models">
           <div className="section-heading-row">
@@ -125,7 +131,7 @@ export default async function VehiclePage({ params }: Props) {
             {money(v.rate)} <em>/ day</em>
           </strong>
         </span>
-        <Link className="action action-gold" href={bookingLink(v.slug)}>
+        <Link className="action action-gold" href={booking}>
           Book this car <ArrowUpRight />
         </Link>
       </div>

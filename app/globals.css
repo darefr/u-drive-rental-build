@@ -4,9 +4,9 @@
 
 :root {
   color-scheme: light;
-  --asphalt: #172127;
-  --gold: #f0bf55;
-  --paper: #f6f6f2;
+  --asphalt: #171e23;
+  --gold: #f6c24c;
+  --paper: #f6f7f5;
   --white: #fff;
   --stone: #586568;
   --background: var(--paper);
@@ -737,6 +737,8 @@
 }
 .mode-spread {
   position: relative;
+  width: 100%;
+  min-width: 0;
   isolation: isolate;
   display: flex;
   align-items: flex-end;

@@ -1,4 +1,5 @@
 import { vehicles } from '@/lib/fleet'
+import { destinations } from '@/lib/destinations'
 import { navigation, siteOrigin } from '@/lib/site'
 
 export function GET(request: Request) {
@@ -6,6 +7,8 @@ export function GET(request: Request) {
   const paths = [
     ...navigation.map((n) => n.href),
     ...vehicles.map((v) => `/fleet/${v.slug}`),
+    ...destinations.map((d) => `/destinations/${d.slug}`),
+    '/service-area',
     '/booking',
     '/privacy',
   ]

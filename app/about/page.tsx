@@ -27,7 +27,10 @@ export default function AboutPage() {
               U Drive Rental Car Kathmandu connects a choice of vehicles with two ways to explore
               Nepal: take the wheel yourself, or travel with a professional driver.
             </p>
-            <TextLink href="/fleet">Meet the fleet</TextLink>
+            <div className="action-row">
+              <TextLink href="/fleet">Meet the fleet</TextLink>
+              <TextLink href="/destinations">Explore destinations</TextLink>
+            </div>
           </div>
           <figure>
             <Image

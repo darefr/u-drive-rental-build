@@ -3,10 +3,15 @@ import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { FloatingContactButtons } from '@/components/floating-contact'
 import { siteOrigin } from '@/lib/site'
 import './globals.css'
 import './inner-pages.css'
 import './business-pages.css'
+import '@/components/booking.css'
+import './drive.css'
+import './journeys.css'
+import './company.css'
 
 const display = localFont({
   src: [
@@ -39,7 +44,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_NP',
     siteName: 'U Drive Rental Car Kathmandu',
-    title: 'Drive Nepal. Your Way. | U Drive Rental Car Kathmandu',
+    title: 'Drive Your Journey Across Nepal | U Drive Rental Car Kathmandu',
     description:
       'Premium car rentals in Kathmandu and across Nepal. Explore our fleet, compare daily rates, and choose your drive.',
     images: [{ url: '/images/hero-wide.webp', alt: 'U Drive — premium car rental in Nepal' }],
@@ -49,7 +54,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#172127',
+  themeColor: '#171e23',
   colorScheme: 'light',
 }
 
@@ -63,6 +68,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteHeader />
         {children}
         <SiteFooter />
+        <FloatingContactButtons />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

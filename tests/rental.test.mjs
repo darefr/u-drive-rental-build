@@ -9,6 +9,49 @@ import {
 } from '../lib/rental-request.ts'
 import { bookingLink, findVehicle, money, vehicles, whatsappLink } from '../lib/fleet.ts'
 
+import { readTripSearch, tripHref } from '../lib/trip-search.ts'
+
+test('search choices survive the fleet, model and booking handoff', () => {
+  const values = {
+    vehicle: 'byd-atto-3',
+    mode: 'with-driver',
+    pickup: 'Kathmandu',
+    start: '2027-02-01',
+    end: '2027-02-04',
+    destination: 'Pokhara',
+  }
+  const trip = readTripSearch(values, '2027-01-01')
+  assert.deepEqual(trip, values)
+  const href = tripHref('/booking', trip)
+  assert.deepEqual(Object.fromEntries(new URL(href, 'https://example.com').searchParams), values)
+  assert.equal(
+    money(findVehicle(trip.vehicle).rate * rentalDays(trip.start, trip.end)),
+    'NPR 27,000',
+  )
+})
+test('untrusted query values cannot introduce a price, invalid model, or reversed rental', () => {
+  const trip = readTripSearch(
+    {
+      vehicle: 'unknown',
+      mode: ['bad'],
+      start: '2027-10-02',
+      end: '2027-10-01',
+      rate: '1',
+      pickup: ' A & B ',
+      destination: 'x'.repeat(80),
+    },
+    '2027-01-01',
+  )
+  assert.equal(trip.vehicle, '')
+  assert.equal(trip.mode, 'self-drive')
+  assert.equal(trip.end, '')
+  assert.equal(trip.pickup, 'A & B')
+  assert.equal(trip.destination.length, 60)
+  assert.equal('rate' in trip, false)
+  assert.equal(readTripSearch({ start: '2025-01-01', end: '2025-02-01' }, '2026-01-01').start, '')
+  assert.equal(tripHref('/fleet', {}), '/fleet')
+})
+
 const draft = {
   vehicle: 'deepal-s05',
   mode: 'self-drive',
@@ -64,6 +107,10 @@ test('trip validation checks pickup, return, and separate drop-off', () => {
   assert.ok(validateTrip({ ...draft, returnDate: '2027-01-31' }, '2027-01-01').returnDate)
   assert.ok(validateTrip({ ...draft, pickupLocation: ' ' }, '2027-01-01').pickupLocation)
   assert.ok(validateTrip({ ...draft, sameReturn: false }, '2027-01-01').returnLocation)
+})
+test('pickup timing is optional, uses local time, and rejects impossible hours', () => {
+  assert.deepEqual(validateTrip({ ...draft, pickupTime: '08:30' }, '2027-01-01'), {})
+  assert.ok(validateTrip({ ...draft, pickupTime: '25:99' }, '2027-01-01').pickupTime)
 })
 test('contact validation accepts international numbers and rejects incomplete requests', () => {
   assert.deepEqual(validateContact(draft), {})

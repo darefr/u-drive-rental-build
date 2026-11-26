@@ -2,15 +2,17 @@ import { HomeHero } from '@/components/home-hero'
 import { QuickPlanner } from '@/components/quick-planner'
 import { FleetShowcase } from '@/components/fleet-showcase'
 import { RentalOptions } from '@/components/rental-options'
-import { ServiceArea } from '@/components/service-area'
+import { DestinationPreview } from '@/components/destination-card'
+import { HomeStory, ReviewPreview } from '@/components/home-story'
+import { StatsCounter } from '@/components/stats-counter'
 import { ProcessPreview } from '@/components/process-timeline'
 import { CTASection } from '@/components/editorial'
 import { business, vehicles } from '@/lib/fleet'
 import { pageMeta } from '@/lib/site'
 
 export const metadata = pageMeta(
-  'Premium Car Rental Nepal',
-  'Choose self-drive or a professional driver in Kathmandu. Explore four U Drive rental cars, exact daily rates, and vehicle delivery across Nepal.',
+  'Car Rental in Kathmandu — Drive Your Journey Across Nepal',
+  'Compare four rental cars from NPR 6,500/day, choose self-drive or a driver, and plan a journey from Kathmandu across Nepal. Explore vehicles, destination guides, and trip estimates.',
   '/',
 )
 export default function HomePage() {
@@ -49,8 +51,11 @@ export default function HomePage() {
       <HomeHero />
       <QuickPlanner />
       <FleetShowcase />
+      <DestinationPreview />
       <RentalOptions />
-      <ServiceArea />
+      <HomeStory />
+      <StatsCounter />
+      <ReviewPreview />
       <ProcessPreview />
       <CTASection />
     </main>

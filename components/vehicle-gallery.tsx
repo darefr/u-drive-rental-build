@@ -12,7 +12,9 @@ export function VehicleGallery({ vehicle: v }: { vehicle: Vehicle }) {
     { image: `/images/${v.slug}.webp`, label: 'Exterior view', alt: v.imageAlt },
     {
       image:
-        v.slug === 'deepal-s05' ? '/images/mountain-mobile.webp' : `/images/${v.slug}-profile.webp`,
+        v.slug === 'deepal-s05'
+          ? '/images/nepal-drive-mobile.webp'
+          : `/images/${v.slug}-profile.webp`,
       label: 'Road portrait',
       alt: `${v.name} in an outdoor setting, showing its exterior profile`,
     },

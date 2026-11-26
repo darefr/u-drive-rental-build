@@ -51,7 +51,7 @@ export default async function ContactPage({
                 </span>
                 <ArrowUpRight />
               </a>
-              <Link href="/service-area">
+              <Link href="/destinations">
                 <MapPin />
                 <span>
                   <small>SERVICE AREA</small>Kathmandu + All Nepal

@@ -29,7 +29,7 @@ const modeCopy = {
     faqs: [
       {
         q: 'What do I need for a self-drive rental?',
-        a: 'Requirements will be confirmed during booking. Tell U Drive about your planned trip before arranging collection.',
+        a: 'You need a driving licence valid for your intended journey in Nepal. Ask the team which licence and identity documents they need for your particular rental, and confirm the terms before collection.',
       },
       {
         q: 'Can I choose my pickup location?',
@@ -57,9 +57,18 @@ const modeCopy = {
     heading: 'Your plans. A driver at the wheel.',
     text: 'Choose a driver-assisted rental when you would rather focus on the people and places along the way. U Drive coordinates your vehicle, driver, and pickup for the itinerary you share.',
     points: [
-      ['Enjoy the journey', 'Leave the driving to a professional while you take in the view.'],
-      ['Plan your stops', 'Share your preferred route and stops for the team to confirm.'],
-      ['Arrange one meeting point', 'Agree your pickup time and place directly with U Drive.'],
+      [
+        'Sightseeing & longer journeys',
+        'Share the places you want to see, including overnight stops, so the team can check your route.',
+      ],
+      [
+        'Business travel',
+        'Plan your meetings and preferred pickup times while a professional driver takes the wheel.',
+      ],
+      [
+        'Airport & hotel pickups',
+        'Include your arrival details and accommodation. The team will agree the exact meeting point and timing.',
+      ],
     ],
     faqs: [
       {

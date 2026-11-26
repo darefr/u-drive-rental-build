@@ -1,28 +1,29 @@
 import { BookingFlow } from '@/components/booking-flow'
-import { findVehicle, vehicles } from '@/lib/fleet'
+import { vehicles } from '@/lib/fleet'
 import { todayInNepal } from '@/lib/rental-request'
 import { pageMeta } from '@/lib/site'
+import { readTripSearch, type QueryValues } from '@/lib/trip-search'
 
 export const metadata = pageMeta(
   'Book a Car — Plan Your Rental',
-  'Choose your car, rental mode, pickup and return dates. Review a live NPR estimate before sending your rental request directly to U Drive.',
+  'Choose a vehicle, a rental type, and your dates. Review your live NPR estimate and send a rental enquiry to the U Drive Kathmandu team.',
   '/booking',
 )
 export default async function BookingPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>
+  searchParams: Promise<QueryValues>
 }) {
-  const q = await searchParams
-  const car = findVehicle(typeof q.vehicle === 'string' ? q.vehicle : undefined) ?? vehicles[0]
-  const mode = q.mode === 'with-driver' ? 'with-driver' : 'self-drive'
+  const today = todayInNepal()
+  const trip = readTripSearch(await searchParams, today)
   return (
     <main id="main-content">
       <BookingFlow
-        key={`${car.slug}-${mode}`}
-        initialVehicle={car.slug}
-        initialMode={mode}
-        today={todayInNepal()}
+        key={JSON.stringify(trip)}
+        initialVehicle={trip.vehicle || vehicles[0].slug}
+        initialMode={trip.mode}
+        initialTrip={trip}
+        today={today}
       />
     </main>
   )

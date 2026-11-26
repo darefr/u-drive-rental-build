@@ -6,6 +6,8 @@ export interface RentalRequest {
   pickupDate: string
   returnDate: string
   pickupLocation: string
+  handover: 'pickup' | 'delivery'
+  pickupTime: string
   sameReturn: boolean
   returnLocation: string
   name: string
@@ -64,6 +66,8 @@ export function validateTrip(request: RentalRequest, today: string): RequestErro
   if (dateValue(request.returnDate) === null) errors.returnDate = 'Choose a valid return date.'
   else if (request.returnDate < request.pickupDate)
     errors.returnDate = 'The return date cannot be before pickup.'
+  if (request.pickupTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(request.pickupTime))
+    errors.pickupTime = 'Choose a valid pickup time.'
   if (request.pickupLocation.trim().length < 2)
     errors.pickupLocation = 'Enter your preferred pickup location.'
   else if (request.pickupLocation.length > 160)

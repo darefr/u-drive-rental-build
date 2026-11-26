@@ -12,6 +12,11 @@ function summary({ request: r, vehicle: v }: Props) {
     ['Rental mode', modeName(r.mode)],
     ['Pickup date', prettyDate(r.pickupDate)],
     ['Return date', prettyDate(r.returnDate)],
+    [
+      'Handover preference',
+      r.handover === 'delivery' ? 'Vehicle delivery requested' : 'Collect the vehicle',
+    ],
+    ...(r.pickupTime ? [['Preferred pickup time (Nepal)', r.pickupTime]] : []),
     ['Pickup / delivery', r.pickupLocation.trim()],
     ['Return location', r.sameReturn ? r.pickupLocation.trim() : r.returnLocation.trim()],
     ['Daily vehicle rate', `${money(v.rate)} / day`],

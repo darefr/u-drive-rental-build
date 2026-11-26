@@ -8,7 +8,6 @@ import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { Textarea } from './ui/textarea'
 import { MessageHandoff } from './message-handoff'
 import { validEmail } from '@/lib/rental-request'
-import './booking.css'
 
 export function EnquiryForm({ delivery = false }: { delivery?: boolean }) {
   const [values, setValues] = useState({

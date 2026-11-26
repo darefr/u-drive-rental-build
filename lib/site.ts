@@ -6,9 +6,10 @@ export const navigation = [
   { label: 'Fleet', href: '/fleet' },
   { label: 'Self Drive', href: '/self-drive' },
   { label: 'With Driver', href: '/with-driver' },
-  { label: 'Service Area', href: '/service-area' },
+  { label: 'Destinations', href: '/destinations' },
   { label: 'How It Works', href: '/how-it-works' },
   { label: 'About', href: '/about' },
+  { label: 'Reviews', href: '/reviews' },
   { label: 'FAQ', href: '/faq' },
   { label: 'Contact', href: '/contact' },
 ] as const

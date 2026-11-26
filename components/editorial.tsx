@@ -55,13 +55,13 @@ export function CTASection({
   label?: string
 }) {
   return (
-    <section className="closing-cta">
+    <section className="closing-cta photo-cta">
       <div className="shell closing-inner">
         <div>
           <p className="overline">YOUR NEXT JOURNEY</p>
           <h2 className="display">{title}</h2>
         </div>
-        <Link href={href} className="action action-dark">
+        <Link href={href} className="action action-gold">
           {label} <ArrowRight />
         </Link>
       </div>
