@@ -59,7 +59,7 @@ export function SiteHeader() {
   return (
     <header className="masthead drive-header" data-ready={ready}>
       <div className="shell masthead-inner">
-        <Brand reversed />
+        <Brand />
         <nav className="main-nav" aria-label="Main navigation">
           {navigation
             .filter((n) => !['/faq', '/with-driver'].includes(n.href))

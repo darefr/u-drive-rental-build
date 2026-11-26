@@ -8,6 +8,11 @@
 }
 .drive-header .brand-lockup-image {
   width: 148px;
+  height: auto;
+  padding: 3px 6px;
+  background-color: #fff;
+  border-radius: 3px;
+  object-fit: contain;
 }
 .drive-header .main-nav {
   gap: clamp(15px, 1.65vw, 28px);

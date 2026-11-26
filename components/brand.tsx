@@ -6,8 +6,8 @@ export function Brand({ reversed = false }: { reversed?: boolean }) {
     <Link href="/" className="brand-lockup" aria-label="U Drive Rental Car Kathmandu home">
       <Image
         src={reversed ? '/brand/u-drive-reversed.svg' : '/brand/u-drive-user-logo.png'}
-        width={1800}
-        height={850}
+        width={reversed ? 300 : 2152}
+        height={reversed ? 100 : 746}
         className="brand-lockup-image"
         alt=""
         unoptimized
