@@ -10,6 +10,7 @@ export interface RentalRequest {
   returnLocation: string
   name: string
   phone: string
+  email: string
   notes: string
 }
 export type RequestErrors = Partial<Record<keyof RentalRequest, string>>
@@ -75,6 +76,14 @@ export function validateTrip(request: RentalRequest, today: string): RequestErro
   return errors
 }
 
+export function validEmail(value: string) {
+  return (
+    typeof value === 'string' &&
+    value.trim().length <= 254 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+  )
+}
+
 export function validateContact(request: RentalRequest): RequestErrors {
   const errors: RequestErrors = {}
   if (request.name.trim().length < 2 || request.name.length > 80)
@@ -82,6 +91,7 @@ export function validateContact(request: RentalRequest): RequestErrors {
   const number = request.phone.replace(/[\s().-]/g, '')
   if (!/^\+?\d{7,15}$/.test(number))
     errors.phone = 'Enter a valid phone number, including your country code.'
+  if (!validEmail(request.email)) errors.email = 'Enter a valid email address.'
   if (request.notes.length > 600) errors.notes = 'Keep your notes under 600 characters.'
   return errors
 }

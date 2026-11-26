@@ -82,7 +82,7 @@ export function bookingLink(slug?: string, mode?: RentalMode) {
   const query = new URLSearchParams()
   if (slug) query.set('vehicle', slug)
   if (mode) query.set('mode', mode)
-  return `/book${query.size ? `?${query}` : ''}`
+  return `/booking${query.size ? `?${query}` : ''}`
 }
 
 export function whatsappLink(

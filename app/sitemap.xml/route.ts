@@ -1,9 +1,14 @@
 import { vehicles } from '@/lib/fleet'
+import { navigation, siteOrigin } from '@/lib/site'
 
 export function GET(request: Request) {
-  const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  const origin = productionHost ? `https://${productionHost}` : new URL(request.url).origin
-  const paths = ['/', ...vehicles.map((v) => `/cars/${v.slug}`), '/privacy']
+  const origin = siteOrigin(new URL(request.url).origin)
+  const paths = [
+    ...navigation.map((n) => n.href),
+    ...vehicles.map((v) => `/fleet/${v.slug}`),
+    '/booking',
+    '/privacy',
+  ]
   const urls = paths
     .map(
       (path) =>

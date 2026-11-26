@@ -1,0 +1,34 @@
+import { Breadcrumbs, CTASection, PageIntro } from '@/components/editorial'
+import { FleetCatalogue } from '@/components/fleet-catalogue'
+import { pageMeta } from '@/lib/site'
+
+export const metadata = pageMeta(
+  'Our Fleet — Car Rental Kathmandu',
+  'Compare the Deepal S05, BYD Atto 3, Tata Nexon, and BYD Atto 1. Explore daily rental rates from NPR 6,500 and request your preferred car.',
+  '/fleet',
+  '/images/deepal-s05.webp',
+)
+export default function FleetPage() {
+  return (
+    <main id="main-content">
+      <div className="shell">
+        <Breadcrumbs items={[{ label: 'Our fleet' }]} />
+        <div className="catalogue-intro">
+          <PageIntro label="THE U DRIVE COLLECTION" title="Our fleet.">
+            Four cars, two ways to travel. Explore each model and find the right daily rate for your
+            journey.
+          </PageIntro>
+          <span className="collection-count">
+            <strong>04</strong> VEHICLES
+          </span>
+        </div>
+        <FleetCatalogue />
+        <p className="catalogue-footnote">
+          Daily vehicle rates are shown in Nepalese rupees. Availability, driver arrangements, and
+          delivery are confirmed for your booking. Vehicle images are illustrative.
+        </p>
+      </div>
+      <CTASection />
+    </main>
+  )
+}

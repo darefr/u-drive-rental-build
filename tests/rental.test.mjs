@@ -19,6 +19,7 @@ const draft = {
   returnLocation: '',
   name: 'Test Driver',
   phone: '+977 9800000000',
+  email: 'driver@example.com',
   notes: '',
 }
 
@@ -70,12 +71,14 @@ test('contact validation accepts international numbers and rejects incomplete re
   for (const phone of ['abc12345', '123', '+1234567890123456'])
     assert.ok(validateContact({ ...draft, phone }).phone)
   assert.ok(validateContact({ ...draft, name: '  ' }).name)
+  for (const email of ['', 'not-an-email', 'a@', 'a@a .com'])
+    assert.ok(validateContact({ ...draft, email }).email)
   assert.ok(validateContact({ ...draft, notes: 'n'.repeat(601) }).notes)
 })
 test('inquiry links preserve mode and safely encode message contents', () => {
   assert.equal(
     bookingLink('byd-atto-1', 'with-driver'),
-    '/book?vehicle=byd-atto-1&mode=with-driver',
+    '/booking?vehicle=byd-atto-1&mode=with-driver',
   )
   assert.equal(findVehicle('missing'), undefined)
   const message = 'Pickup: A & B\nName: नेपाल'

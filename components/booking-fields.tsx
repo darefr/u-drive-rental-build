@@ -13,7 +13,7 @@ export type FieldsProps = {
   update: (patch: Partial<RentalRequest>) => void
 }
 
-function TextField({
+export function TextField({
   label,
   error,
   ...props
@@ -38,13 +38,20 @@ function TextField({
   )
 }
 
-export function TripFields({ request, errors, update, today }: FieldsProps & { today: string }) {
+export function TripFields({
+  request,
+  errors,
+  update,
+  today,
+  lockedVehicle = false,
+}: FieldsProps & { today: string; lockedVehicle?: boolean }) {
   return (
     <FieldGroup className="booking-fields">
       <Field>
         <FieldLabel htmlFor="vehicle">Your vehicle</FieldLabel>
         <select
           id="vehicle"
+          disabled={lockedVehicle}
           value={request.vehicle}
           onChange={(e) => update({ vehicle: e.target.value })}
         >
@@ -83,7 +90,7 @@ export function TripFields({ request, errors, update, today }: FieldsProps & { t
       </div>
       <TextField
         id="pickupLocation"
-        label="Preferred pickup location"
+        label="Pickup / delivery location"
         type="text"
         placeholder="Hotel, neighbourhood, or meeting point"
         required
@@ -150,9 +157,22 @@ export function ContactFields({ request, errors, update }: FieldsProps) {
         error={errors.phone}
         onChange={(e) => update({ phone: e.target.value })}
       />
+      <TextField
+        id="email"
+        label="Email address"
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        required
+        maxLength={254}
+        placeholder="you@example.com"
+        value={request.email}
+        error={errors.email}
+        onChange={(e) => update({ email: e.target.value })}
+      />
       <Field data-invalid={Boolean(errors.notes)}>
         <FieldLabel htmlFor="notes">
-          Trip notes <span className="optional-label">Optional</span>
+          Additional message <span className="optional-label">Optional</span>
         </FieldLabel>
         <Textarea
           id="notes"

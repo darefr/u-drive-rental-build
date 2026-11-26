@@ -1,44 +1,61 @@
 import Link from 'next/link'
-import { ArrowUpRight, MapPinned, UserRoundCheck } from 'lucide-react'
-import { WheelIcon } from '@/components/brand'
-import { bookingLink } from '@/lib/fleet'
+import Image from 'next/image'
+import { ArrowUpRight } from 'lucide-react'
+import { Eyebrow } from './brand'
 
+const modes = [
+  {
+    href: '/self-drive',
+    label: 'Self Drive',
+    title: 'Take the wheel.',
+    copy: 'Your route. Your own pace.',
+    image: 'driver-view',
+    alt: 'A driver at the wheel on a quiet mountain road',
+  },
+  {
+    href: '/with-driver',
+    label: 'With Driver',
+    title: 'Take in the view.',
+    copy: 'Your itinerary, with a professional driver.',
+    image: 'nepal-road',
+    alt: 'A winding Nepal road opening onto a mountain valley',
+  },
+]
 export function RentalOptions() {
-  const options = [
-    {
-      title: 'Self Drive',
-      text: 'Take the wheel. Set your pace.',
-      icon: WheelIcon,
-      href: bookingLink(undefined, 'self-drive'),
-    },
-    {
-      title: 'With Driver',
-      text: 'Sit back with a professional driver.',
-      icon: UserRoundCheck,
-      href: bookingLink(undefined, 'with-driver'),
-    },
-    {
-      title: 'All-Nepal Service',
-      text: 'Kathmandu and everywhere beyond.',
-      icon: MapPinned,
-      href: '/#service-area',
-    },
-  ]
   return (
-    <section id="rental-options" className="rental-band" aria-label="Rental options and coverage">
-      <div className="shell rental-band-inner">
-        {options.map(({ icon: Icon, ...option }) => (
-          <Link href={option.href} key={option.title} className="rental-shortcut">
-            <span className="shortcut-icon">
-              <Icon />
-            </span>
-            <span className="shortcut-copy">
-              <strong>{option.title}</strong>
-              <span>{option.text}</span>
-            </span>
-            <ArrowUpRight className="shortcut-arrow" size={16} aria-hidden="true" />
-          </Link>
-        ))}
+    <section className="rental-modes-section">
+      <div className="shell section-space">
+        <div className="section-heading-row">
+          <div>
+            <Eyebrow light>RENTAL MODES</Eyebrow>
+            <h2 className="editorial-title">Two ways to go.</h2>
+          </div>
+          <p className="section-aside">
+            The same open road.
+            <br />A different way to experience it.
+          </p>
+        </div>
+        <div className="mode-spreads">
+          {modes.map((m) => (
+            <Link href={m.href} className="mode-spread" key={m.href}>
+              <Image
+                fill
+                src={`/images/${m.image}.webp`}
+                alt={m.alt}
+                sizes="(max-width: 680px) 95vw, 47vw"
+              />
+              <div className="mode-spread-shade" />
+              <div className="mode-spread-copy">
+                <p className="overline">{m.label}</p>
+                <h3 className="display">{m.title}</h3>
+                <p>{m.copy}</p>
+              </div>
+              <span className="mode-open">
+                <ArrowUpRight />
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   )

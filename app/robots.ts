@@ -1,9 +1,6 @@
 import type { MetadataRoute } from 'next'
+import { siteOrigin } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
-  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
-  return {
-    rules: { userAgent: '*', allow: '/', disallow: '/book' },
-    ...(host ? { sitemap: `https://${host}/sitemap.xml` } : {}),
-  }
+  return { rules: { userAgent: '*', allow: '/' }, sitemap: `${siteOrigin()}/sitemap.xml` }
 }

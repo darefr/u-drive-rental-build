@@ -3,7 +3,10 @@ import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { siteOrigin } from '@/lib/site'
 import './globals.css'
+import './inner-pages.css'
+import './business-pages.css'
 
 const display = localFont({
   src: [
@@ -21,10 +24,9 @@ const sans = localFont({
   display: 'swap',
   fallback: ['Arial'],
 })
-const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
 
 export const metadata: Metadata = {
-  metadataBase: host ? new URL(`https://${host}`) : undefined,
+  metadataBase: new URL(siteOrigin()),
   title: {
     default: 'U Drive Rental Car Kathmandu | Self Drive & With Driver',
     template: '%s | U Drive Rental Car Kathmandu',
@@ -47,17 +49,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#171919',
+  themeColor: '#172127',
   colorScheme: 'light',
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      data-scroll-behavior="smooth"
-      className={`bg-background ${display.variable} ${sans.variable}`}
-    >
+    <html lang="en" className={`bg-background ${display.variable} ${sans.variable}`}>
       <body className="font-sans antialiased">
         <a className="skip-link" href="#main-content">
           Skip to content

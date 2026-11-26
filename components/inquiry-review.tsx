@@ -1,99 +1,96 @@
-'use client'
-
-import { useState } from 'react'
-import { Check, Copy, Mail, MessageCircle } from 'lucide-react'
-import { business, modeName, money, whatsappLink, type Vehicle } from '@/lib/fleet'
+import Link from 'next/link'
+import { ArrowRight, Clock3, MessageCircle } from 'lucide-react'
+import { MessageHandoff } from './message-handoff'
+import { modeName, money, whatsappLink, type Vehicle } from '@/lib/fleet'
 import { prettyDate, rentalDays, type RentalRequest } from '@/lib/rental-request'
 
-export function InquiryReview({ request, vehicle }: { request: RentalRequest; vehicle: Vehicle }) {
-  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'manual'>('idle')
-  const [opened, setOpened] = useState(false)
-  const days = rentalDays(request.pickupDate, request.returnDate) ?? 0
-  const rows = [
-    ['Vehicle', vehicle.name],
-    ['Rental preference', modeName(request.mode)],
-    ['Pickup date', prettyDate(request.pickupDate)],
-    ['Return date', prettyDate(request.returnDate)],
-    ['Pickup location', request.pickupLocation.trim()],
-    [
-      'Drop-off location',
-      request.sameReturn ? request.pickupLocation.trim() : request.returnLocation.trim(),
-    ],
-    ['Daily rate', `${money(vehicle.rate)}/day`],
-    ['Duration', `${days} ${days === 1 ? 'day' : 'days'}`],
-    ['Vehicle-rate estimate', money(days * vehicle.rate)],
-    ['Name', request.name.trim()],
-    ['Phone', request.phone.trim()],
-    ...(request.notes.trim() ? [['Trip notes', request.notes.trim()]] : []),
+type Props = { request: RentalRequest; vehicle: Vehicle }
+function summary({ request: r, vehicle: v }: Props) {
+  const days = rentalDays(r.pickupDate, r.returnDate) ?? 0
+  return [
+    ['Vehicle', v.name],
+    ['Rental mode', modeName(r.mode)],
+    ['Pickup date', prettyDate(r.pickupDate)],
+    ['Return date', prettyDate(r.returnDate)],
+    ['Pickup / delivery', r.pickupLocation.trim()],
+    ['Return location', r.sameReturn ? r.pickupLocation.trim() : r.returnLocation.trim()],
+    ['Daily vehicle rate', `${money(v.rate)} / day`],
+    ['Rental duration', `${days} ${days === 1 ? 'day' : 'days'}`],
+    ['Estimated total', money(days * v.rate)],
+    ['Customer name', r.name.trim()],
+    ['Phone number', r.phone.trim()],
+    ['Email', r.email.trim()],
+    ...(r.notes.trim() ? [['Additional message', r.notes.trim()]] : []),
   ]
+}
+export function InquiryReview({ request, vehicle, onSent }: Props & { onSent: () => void }) {
+  const rows = summary({ request, vehicle })
   const message = [
-    'Hello U Drive, I would like to request a rental.',
+    'Hello U Drive, I would like to submit a booking request.',
     '',
     ...rows.map(([k, v]) => `${k}: ${v}`),
     '',
-    'Please confirm availability, pickup arrangements, and the final rental terms and amount.',
+    'Please confirm availability, the final rental terms, and the pickup or delivery arrangements.',
   ].join('\n')
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(message)
-      setCopyState('copied')
-    } catch {
-      setCopyState('manual')
-    }
-  }
   return (
     <div className="inquiry-review">
+      <p className="review-intro">
+        Check your trip, estimate, and contact details before sending. This is a request, not a
+        confirmed reservation.
+      </p>
       <dl className="review-list">
-        {rows.map(([key, value]) => (
-          <div key={key}>
-            <dt>{key}</dt>
-            <dd>{value}</dd>
+        {rows.map(([k, v]) => (
+          <div key={k}>
+            <dt>{k}</dt>
+            <dd>{v}</dd>
           </div>
         ))}
       </dl>
-      <div className="send-note">
-        <strong>One last step: send your message.</strong>
-        <p>
-          WhatsApp opens with your inquiry filled in. Tap Send there. Your car is not reserved until
-          U Drive confirms your booking.
-        </p>
-      </div>
+      <MessageHandoff
+        message={message}
+        subject={`Booking request — ${vehicle.name}`}
+        onSent={onSent}
+      />
+    </div>
+  )
+}
+export function RequestReceipt({ request, vehicle }: Props) {
+  const rows = summary({ request, vehicle })
+  return (
+    <div className="request-receipt">
+      <span className="receipt-status">
+        <Clock3 size={16} /> AWAITING CONFIRMATION
+      </span>
+      <p>
+        You marked your booking request as sent. Your car is <strong>not reserved yet</strong>. U
+        Drive will confirm the vehicle, dates, pickup, and final terms with you.
+      </p>
+      <dl className="review-list">
+        {rows.map(([k, v]) => (
+          <div key={k}>
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
+      </dl>
       <a
-        className="action action-gold send-action"
+        className="action action-outline"
         target="_blank"
         rel="noopener noreferrer"
-        href={whatsappLink(message)}
-        onClick={() => setOpened(true)}
+        href={whatsappLink(
+          `Hello U Drive, I’m following up on my request for the ${vehicle.name}, ${prettyDate(request.pickupDate)} to ${prettyDate(request.returnDate)}.`,
+        )}
       >
-        <MessageCircle />
-        {opened ? 'Open WhatsApp again' : 'Continue to WhatsApp'}
+        <MessageCircle /> Contact U Drive
       </a>
-      <div className="send-alternatives">
-        <a
-          href={`mailto:${business.email}?subject=${encodeURIComponent(`Rental inquiry: ${vehicle.name}`)}&body=${encodeURIComponent(message)}`}
-        >
-          <Mail size={16} />
-          Send by email
-        </a>
-        <button type="button" onClick={copy}>
-          {copyState === 'copied' ? <Check size={16} /> : <Copy size={16} />}
-          {copyState === 'copied' ? 'Inquiry copied' : 'Copy inquiry'}
-        </button>
+      <div className="receipt-links">
+        <Link className="text-action" href="/fleet">
+          Return to fleet <ArrowRight size={15} />
+        </Link>
+        <Link className="back-link" href="/">
+          Return home
+        </Link>
       </div>
-      <p className="sr-only" role="status">
-        {copyState === 'copied' ? 'Rental inquiry copied to your clipboard.' : ''}
-      </p>
-      {copyState === 'manual' && (
-        <label className="manual-copy">
-          Copy this message and send it to the team:
-          <textarea readOnly value={message} onFocus={(e) => e.target.select()} rows={6} />
-        </label>
-      )}
-      {opened && (
-        <p className="handoff-notice" role="status">
-          Finish sending in WhatsApp. If it didn’t open, use email or copy your inquiry instead.
-        </p>
-      )}
     </div>
   )
 }

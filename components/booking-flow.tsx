@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Check, Phone } from 'lucide-react'
-import { Eyebrow } from '@/components/brand'
-import { TripFields, ContactFields } from '@/components/booking-fields'
-import { InquiryReview } from '@/components/inquiry-review'
-import { RentalEstimate } from '@/components/rental-estimate'
+import { Eyebrow } from './brand'
+import { TripFields, ContactFields } from './booking-fields'
+import { InquiryReview, RequestReceipt } from './inquiry-review'
+import { RentalEstimate } from './rental-estimate'
 import { business, findVehicle, money, vehicles, type RentalMode } from '@/lib/fleet'
 import {
   rentalDays,
@@ -16,16 +16,24 @@ import {
   type RentalRequest,
   type RequestErrors,
 } from '@/lib/rental-request'
+import './booking.css'
 
-const titles = ['Your trip details', 'A few details about you', 'Review your inquiry']
+const titles = [
+  'Your trip details',
+  'Your contact details',
+  'Review your request',
+  'Request marked as sent.',
+]
 export function BookingFlow({
   initialVehicle,
   initialMode,
   today,
+  embedded = false,
 }: {
   initialVehicle: string
   initialMode: RentalMode
   today: string
+  embedded?: boolean
 }) {
   const [request, setRequest] = useState<RentalRequest>({
     vehicle: initialVehicle,
@@ -37,55 +45,138 @@ export function BookingFlow({
     returnLocation: '',
     name: '',
     phone: '',
+    email: '',
     notes: '',
   })
   const [step, setStep] = useState(0)
   const [ready, setReady] = useState(false)
+  const [localDay, setLocalDay] = useState(today)
   const [errors, setErrors] = useState<RequestErrors>({})
   const heading = useRef<HTMLHeadingElement>(null)
-  const prevStep = useRef(0)
+  const previous = useRef(0)
   const vehicle = findVehicle(request.vehicle) ?? vehicles[0]
   const days = rentalDays(request.pickupDate, request.returnDate)
-  useEffect(() => setReady(true), [])
   useEffect(() => {
-    if (prevStep.current !== step) {
+    setReady(true)
+    setLocalDay(todayInNepal())
+  }, [])
+  useEffect(() => {
+    if (previous.current !== step) {
       heading.current?.focus({ preventScroll: true })
       heading.current?.scrollIntoView({ behavior: 'instant', block: 'start' })
-      prevStep.current = step
+      previous.current = step
     }
   }, [step])
   function update(patch: Partial<RentalRequest>) {
-    setRequest((r) => ({ ...r, ...patch }))
+    setRequest((value) => ({ ...value, ...patch }))
     setErrors((old) => {
       const next = { ...old }
-      for (const key of Object.keys(patch) as (keyof RentalRequest)[]) delete next[key]
+      for (const k of Object.keys(patch) as (keyof RentalRequest)[]) delete next[k]
       return next
     })
   }
-  function next(event: React.FormEvent) {
+  function advance(event: React.FormEvent) {
     event.preventDefault()
-    const problem = step === 0 ? validateTrip(request, todayInNepal()) : validateContact(request)
-    setErrors(problem)
-    const first = Object.keys(problem)[0]
+    const problems = step === 0 ? validateTrip(request, todayInNepal()) : validateContact(request)
+    setErrors(problems)
+    const first = Object.keys(problems)[0]
     if (first) {
       requestAnimationFrame(() => document.getElementById(first)?.focus())
       return
     }
-    setStep((value) => Math.min(2, value + 1))
+    setStep(step + 1)
   }
+  function edit(s: number) {
+    setErrors({})
+    setStep(s)
+  }
+  const formPanel = (
+    <section className="booking-form-panel" aria-label={`Booking request for ${vehicle.name}`}>
+      {step < 3 && (
+        <ol className="booking-steps" aria-label="Booking progress">
+          {['Trip details', 'Your details', 'Review & send'].map((name, i) => (
+            <li
+              key={name}
+              data-current={i === step}
+              data-complete={i < step}
+              aria-current={i === step ? 'step' : undefined}
+            >
+              <span>{i < step ? <Check size={11} /> : i + 1}</span>
+              {name}
+            </li>
+          ))}
+        </ol>
+      )}
+      <h2 className="form-heading" tabIndex={-1} ref={heading}>
+        {titles[step]}
+      </h2>
+      {step < 2 ? (
+        <form noValidate onSubmit={advance}>
+          {step === 0 ? (
+            <TripFields
+              request={request}
+              errors={errors}
+              update={update}
+              today={localDay}
+              lockedVehicle={embedded}
+            />
+          ) : (
+            <ContactFields request={request} errors={errors} update={update} />
+          )}
+          {days !== null && (
+            <div className={embedded ? 'embedded-estimate' : 'mobile-estimate'} aria-live="polite">
+              <span>
+                {days} {days === 1 ? 'day' : 'days'} × {money(vehicle.rate)}
+              </span>
+              <strong>{money(days * vehicle.rate)}</strong>
+              <small>Estimated vehicle rental. Final terms confirmed by U Drive.</small>
+            </div>
+          )}
+          <div className="form-actions">
+            {step > 0 && (
+              <button type="button" className="back-link" onClick={() => edit(0)}>
+                <ArrowLeft size={15} /> Back
+              </button>
+            )}
+            <button className="action action-gold" type="submit">
+              {step === 0 ? 'Continue to your details' : 'Review booking request'}
+              <ArrowRight />
+            </button>
+          </div>
+        </form>
+      ) : step === 2 ? (
+        <>
+          <InquiryReview request={request} vehicle={vehicle} onSent={() => setStep(3)} />
+          <div className="edit-links">
+            <button className="back-link" type="button" onClick={() => edit(0)}>
+              <ArrowLeft size={15} /> Edit trip
+            </button>
+            <button className="back-link" type="button" onClick={() => edit(1)}>
+              Edit contact details
+            </button>
+          </div>
+        </>
+      ) : (
+        <RequestReceipt request={request} vehicle={vehicle} />
+      )}
+    </section>
+  )
+  if (embedded)
+    return (
+      <div className="embedded-booking" data-ready={ready}>
+        {formPanel}
+      </div>
+    )
   return (
-    <main id="main-content" className="booking-page shell" data-ready={ready}>
-      <Link href="/#fleet" className="back-link">
-        <ArrowLeft size={15} />
-        Back to the fleet
+    <div className="booking-page shell" data-ready={ready}>
+      <Link className="back-link" href="/fleet">
+        <ArrowLeft size={15} /> Back to the fleet
       </Link>
       <div className="booking-heading">
         <div>
-          <Eyebrow>RENTAL INQUIRY</Eyebrow>
-          <h1 className="display section-title">
-            PLAN YOUR DRIVE<span className="brand-period">.</span>
-          </h1>
-          <p>Choose your car and dates. We’ll confirm the details with you.</p>
+          <Eyebrow>RENTAL REQUEST</Eyebrow>
+          <h1 className="display section-title">PLAN YOUR DRIVE.</h1>
+          <p>Your car, your dates, and a clear estimate before you send.</p>
         </div>
         <a className="booking-help" href={`tel:${business.phone}`}>
           <Phone size={17} />
@@ -95,74 +186,9 @@ export function BookingFlow({
         </a>
       </div>
       <div className="booking-layout">
-        <div className="booking-form-panel">
-          <ol className="booking-steps" aria-label="Booking progress">
-            {['Trip details', 'Your details', 'Review'].map((name, i) => (
-              <li
-                key={name}
-                data-current={i === step}
-                data-complete={i < step}
-                aria-current={i === step ? 'step' : undefined}
-              >
-                <span>{i < step ? <Check size={11} /> : i + 1}</span>
-                {name}
-              </li>
-            ))}
-          </ol>
-          <h2 className="form-heading" tabIndex={-1} ref={heading}>
-            {titles[step]}
-          </h2>
-          {step < 2 ? (
-            <form noValidate onSubmit={next}>
-              {step === 0 ? (
-                <TripFields request={request} errors={errors} update={update} today={today} />
-              ) : (
-                <ContactFields request={request} errors={errors} update={update} />
-              )}
-              {days !== null && (
-                <div className="mobile-estimate" aria-live="polite">
-                  <span>
-                    {days} {days === 1 ? 'day' : 'days'} × {money(vehicle.rate)}/day
-                  </span>
-                  <strong>{money(days * vehicle.rate)}</strong>
-                  <small>Vehicle-rate estimate. Final rental terms are confirmed by U Drive.</small>
-                </div>
-              )}
-              <div className="form-actions">
-                {step > 0 && (
-                  <button
-                    type="button"
-                    className="back-link"
-                    onClick={() => {
-                      setErrors({})
-                      setStep(0)
-                    }}
-                  >
-                    <ArrowLeft size={15} />
-                    Back
-                  </button>
-                )}
-                <button className="action action-gold" type="submit">
-                  {step === 0 ? 'Continue to your details' : 'Review inquiry'}
-                  <ArrowRight />
-                </button>
-              </div>
-            </form>
-          ) : (
-            <>
-              <InquiryReview request={request} vehicle={vehicle} />
-              <button className="back-link edit-inquiry" type="button" onClick={() => setStep(0)}>
-                <ArrowLeft size={15} />
-                Edit trip details
-              </button>
-              <button className="back-link edit-contact" type="button" onClick={() => setStep(1)}>
-                Edit contact details
-              </button>
-            </>
-          )}
-        </div>
+        {formPanel}
         <RentalEstimate request={request} vehicle={vehicle} />
       </div>
-    </main>
+    </div>
   )
 }

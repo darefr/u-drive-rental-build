@@ -1,11 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-export function Brand() {
+export function Brand({ reversed = false }: { reversed?: boolean }) {
   return (
     <Link href="/" className="brand-lockup" aria-label="U Drive Rental Car Kathmandu home">
       <Image
-        src="/brand/u-drive-reversed.svg"
+        src={reversed ? '/brand/u-drive-reversed.svg' : '/brand/u-drive-primary.svg'}
         width={170}
         height={57}
         className="brand-lockup-image"

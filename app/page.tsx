@@ -1,9 +1,18 @@
 import { HomeHero } from '@/components/home-hero'
-import { RentalOptions } from '@/components/rental-options'
+import { QuickPlanner } from '@/components/quick-planner'
 import { FleetShowcase } from '@/components/fleet-showcase'
-import { ServiceArea, RentalGuide } from '@/components/service-area'
+import { RentalOptions } from '@/components/rental-options'
+import { ServiceArea } from '@/components/service-area'
+import { ProcessPreview } from '@/components/process-timeline'
+import { CTASection } from '@/components/editorial'
 import { business, vehicles } from '@/lib/fleet'
+import { pageMeta } from '@/lib/site'
 
+export const metadata = pageMeta(
+  'Premium Car Rental Nepal',
+  'Choose self-drive or a professional driver in Kathmandu. Explore four U Drive rental cars, exact daily rates, and vehicle delivery across Nepal.',
+  '/',
+)
 export default function HomePage() {
   const schema = {
     '@context': 'https://schema.org',
@@ -18,7 +27,7 @@ export default function HomePage() {
     currenciesAccepted: 'NPR',
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: 'Daily car rentals',
+      name: 'Daily vehicle rentals',
       itemListElement: vehicles.map((v) => ({
         '@type': 'Offer',
         itemOffered: { '@type': 'Service', name: `${v.name} rental` },
@@ -26,7 +35,7 @@ export default function HomePage() {
           '@type': 'UnitPriceSpecification',
           price: v.rate,
           priceCurrency: 'NPR',
-          referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'DAY' },
+          unitText: 'day',
         },
       })),
     },
@@ -38,10 +47,12 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
       />
       <HomeHero />
-      <RentalOptions />
+      <QuickPlanner />
       <FleetShowcase />
+      <RentalOptions />
       <ServiceArea />
-      <RentalGuide />
+      <ProcessPreview />
+      <CTASection />
     </main>
   )
 }

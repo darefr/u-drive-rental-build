@@ -3,115 +3,140 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ArrowUpRight, Menu, Phone, X } from 'lucide-react'
-import { Brand } from '@/components/brand'
-import { business } from '@/lib/fleet'
-
-const navigation = [
-  ['Home', 'home'],
-  ['Our Fleet', 'fleet'],
-  ['Rental Options', 'rental-options'],
-  ['Service Area', 'service-area'],
-  ['Contact', 'contact'],
-] as const
+import { ArrowUpRight, MapPin, Menu, MessageCircle, Phone, X } from 'lucide-react'
+import { Brand } from './brand'
+import { business, whatsappLink } from '@/lib/fleet'
+import { navigation } from '@/lib/site'
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const dialog = useRef<HTMLDialogElement>(null)
   const [open, setOpen] = useState(false)
-  const [active, setActive] = useState('home')
-  const menuButton = useRef<HTMLButtonElement>(null)
-  const headerRef = useRef<HTMLElement>(null)
-
+  const [ready, setReady] = useState(false)
+  useEffect(() => setReady(true), [])
+  useEffect(() => {
+    dialog.current?.close()
+  }, [pathname])
   useEffect(() => {
     if (!open) return
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setOpen(false)
-        menuButton.current?.focus()
-      }
+    const original = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const desktop = window.matchMedia('(min-width: 1180px)')
+    const closeOnDesktop = () => {
+      if (desktop.matches) dialog.current?.close()
     }
-    function closeOutside(event: PointerEvent) {
-      if (!headerRef.current?.contains(event.target as Node)) setOpen(false)
-    }
-    document.addEventListener('keydown', closeOnEscape)
-    document.addEventListener('pointerdown', closeOutside)
+    desktop.addEventListener('change', closeOnDesktop)
     return () => {
-      document.removeEventListener('keydown', closeOnEscape)
-      document.removeEventListener('pointerdown', closeOutside)
+      document.body.style.overflow = original
+      desktop.removeEventListener('change', closeOnDesktop)
     }
   }, [open])
-
-  useEffect(() => {
-    if (pathname !== '/') return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting)
-        if (visible.length) setActive(visible[0].target.id)
-      },
-      { rootMargin: '-12% 0px -67% 0px', threshold: 0 },
-    )
-    navigation.forEach(([, id]) => {
-      const section = document.getElementById(id)
-      if (section) observer.observe(section)
-    })
-    return () => observer.disconnect()
-  }, [pathname])
-
-  function navLinks(mobile = false) {
-    return navigation.map(([title, id]) => (
-      <Link
-        key={id}
-        href={id === 'home' ? '/#home' : `/#${id}`}
-        className={pathname === '/' && active === id ? 'nav-link nav-active' : 'nav-link'}
-        aria-current={pathname === '/' && active === id ? 'location' : undefined}
-        onClick={() => {
-          setActive(id)
-          setOpen(false)
-        }}
-      >
-        {title}
-        {mobile && <ArrowUpRight size={16} aria-hidden="true" />}
-      </Link>
-    ))
-  }
-
+  const active = (path: string) =>
+    pathname === path || (path === '/fleet' && pathname.startsWith('/fleet/'))
   return (
-    <header className="site-header" ref={headerRef}>
-      <div className="shell header-inner">
-        <Brand />
-        <nav className="desktop-nav" aria-label="Main navigation">
-          {navLinks()}
-        </nav>
-        <div className="header-actions">
-          <Link
-            className="action action-gold header-book"
-            href="/book"
-            onClick={() => setOpen(false)}
-          >
-            Book a Car <ArrowUpRight aria-hidden="true" />
-          </Link>
-          <button
-            ref={menuButton}
-            type="button"
-            className="menu-toggle"
-            aria-label={open ? 'Close navigation' : 'Open navigation'}
-            aria-expanded={open}
-            aria-controls="mobile-nav"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X /> : <Menu />}
-          </button>
+    <>
+      <div className="utility-bar">
+        <div className="shell utility-inner">
+          <span className="utility-place">
+            <MapPin size={13} aria-hidden="true" /> Kathmandu, Nepal <i />{' '}
+            <span>Nepal-wide service</span>
+          </span>
+          <div className="utility-contact">
+            <a href={`tel:${business.phone}`}>
+              <Phone size={12} /> {business.phoneDisplay}
+            </a>
+            <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+              <MessageCircle size={13} /> WhatsApp <ArrowUpRight size={12} />
+            </a>
+          </div>
         </div>
       </div>
-      {open && (
-        <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation">
-          {navLinks(true)}
-          <a className="mobile-phone" href={`tel:${business.phone}`}>
-            <Phone size={17} />
+      <header className="masthead" data-ready={ready}>
+        <div className="shell masthead-inner">
+          <Brand />
+          <nav className="main-nav" aria-label="Main navigation">
+            {navigation
+              .filter((n) => n.label !== 'FAQ')
+              .map((n) => (
+                <Link key={n.href} href={n.href} aria-current={active(n.href) ? 'page' : undefined}>
+                  {n.label}
+                </Link>
+              ))}
+          </nav>
+          <div className="header-tools">
+            <Link className="action action-gold header-cta" href="/booking">
+              Book a Car <ArrowUpRight />
+            </Link>
+            <button
+              className="menu-trigger icon-button"
+              type="button"
+              aria-label="Open navigation"
+              aria-haspopup="dialog"
+              aria-controls="navigation-drawer"
+              aria-expanded={open}
+              onClick={() => {
+                dialog.current?.showModal()
+                setOpen(true)
+              }}
+            >
+              <Menu />
+            </button>
+          </div>
+        </div>
+        <dialog
+          className="navigation-drawer"
+          id="navigation-drawer"
+          ref={dialog}
+          aria-labelledby="drawer-title"
+          onClose={() => setOpen(false)}
+          onClick={(e) => {
+            if (
+              e.target === e.currentTarget &&
+              e.clientX < e.currentTarget.getBoundingClientRect().left
+            )
+              dialog.current?.close()
+          }}
+        >
+          <div className="drawer-top">
+            <span id="drawer-title" className="eyebrow">
+              U DRIVE / NAVIGATION
+            </span>
+            <button
+              type="button"
+              autoFocus
+              className="icon-button"
+              aria-label="Close navigation"
+              onClick={() => dialog.current?.close()}
+            >
+              <X />
+            </button>
+          </div>
+          <nav aria-label="Mobile navigation" className="drawer-links">
+            {navigation.map((n) => (
+              <Link
+                key={n.href}
+                href={n.href}
+                aria-current={active(n.href) ? 'page' : undefined}
+                onClick={() => dialog.current?.close()}
+              >
+                {n.label === 'Fleet' ? 'Our Fleet' : n.label}
+                <ArrowUpRight size={18} />
+              </Link>
+            ))}
+          </nav>
+          <Link
+            className="action action-gold drawer-book"
+            href="/booking"
+            onClick={() => dialog.current?.close()}
+          >
+            Book a Car <ArrowUpRight />
+          </Link>
+          <a className="drawer-contact" href={`tel:${business.phone}`}>
+            <Phone size={16} />
             {business.phoneDisplay}
           </a>
-        </nav>
-      )}
-    </header>
+        </dialog>
+      </header>
+    </>
   )
 }

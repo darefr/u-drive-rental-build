@@ -1,13 +1,14 @@
-import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/site'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Eyebrow } from '@/components/brand'
 import { business } from '@/lib/fleet'
 
-export const metadata: Metadata = {
-  title: 'Privacy and rental inquiries',
-  description: 'How your rental inquiry is prepared and shared with U Drive Rental Car Kathmandu.',
-}
+export const metadata = pageMeta(
+  'Privacy & Rental Enquiries',
+  'How your rental request is prepared, reviewed, and shared directly with U Drive Rental Car Kathmandu.',
+  '/privacy',
+)
 export default function PrivacyPage() {
   return (
     <main id="main-content" className="simple-page shell">
@@ -28,7 +29,8 @@ export default function PrivacyPage() {
         <p>
           When you choose WhatsApp or email, your selected service opens with the details you
           reviewed. You decide whether to send the message. That service’s privacy policy applies,
-          and U Drive receives your inquiry when you send it.
+          and delivery is handled by that service. Marking a request as sent on this site is your
+          own acknowledgement, not verification of delivery or a confirmed booking.
         </p>
         <h2>Site operation</h2>
         <p>
